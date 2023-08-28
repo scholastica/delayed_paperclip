@@ -53,12 +53,19 @@ module DelayedPaperclip
       reprocess!(*delayed_only_process)
       self.job_is_processing = false
       update_processing_column
+      instance.send("#{after_delayed_processing}") if after_delayed_processing.present?
     end
 
     def processing_image_url
       processing_image_url = delayed_options[:processing_image_url]
       processing_image_url = processing_image_url.call(self) if processing_image_url.respond_to?(:call)
       processing_image_url
+    end
+
+    def after_delayed_processing
+      after_delayed_processing = delayed_options[:after_delayed_processing]
+      after_delayed_processing = after_delayed_processing.call(self) if after_delayed_processing.respond_to?(:call)
+      after_delayed_processing
     end
 
     def save
